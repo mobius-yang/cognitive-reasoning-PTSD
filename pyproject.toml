@@ -1,0 +1,22 @@
+[project]
+name = "cognitive-reasoning-project"
+version = "0.1.0"
+description = "Course project for 认知推理 — data processing and modeling"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [ { name="Student", email="" } ]
+
+[project.urls]
+"Homepage" = "https://github.com/yourname/repo-name"
+
+[project.dependencies]
+numpy = "*"
+pandas = "*"
+scikit-learn = "*"
+matplotlib = "*"
+seaborn = "*"
+xgboost = "*"
+
+[build-system]
+requires = ["setuptools>=61.0","wheel"]
+build-backend = "setuptools.build_meta"

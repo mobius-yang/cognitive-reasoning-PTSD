@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+.eggs/
+.python-version
+env/
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+
+# Results and temporary
+results/
+logs/
+*.log
+
+# Byte-compiled / optimized
+__pycache__/
+*.pyc
+
+# Environments
+.env
+*.env

@@ -13,23 +13,7 @@
 - Python 版本：建议 3.9+（3.8+ 也通常可用）
 - 依赖：见 `requirements.txt`，核心依赖包括 `pandas`、`scikit-learn`、`matplotlib`、`seaborn`、`xgboost`
 
-## 安装
 
-使用 venv：
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-如果你使用 conda，也可以：
-
-```bash
-conda create -n NLP python=3.10 -y
-conda activate NLP
-pip install -r requirements.txt
-```
 
 ## 数据准备（请自行完成）
 

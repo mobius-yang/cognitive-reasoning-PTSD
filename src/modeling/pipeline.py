@@ -1,3 +1,7 @@
+# src/modeling/pipeline.py
+"""
+Model training and evaluation pipeline.
+"""
 from __future__ import annotations
 
 from pathlib import Path
@@ -38,7 +42,8 @@ from .core_utils import (
     save_json,
 )
 from .plots import plot_binary_diagnostics, plot_top_feature_importance, plot_triclass_confusion
-
+from .feature_mining import mine_advanced_features
+from .unsupervised import run_spectral_clustering
 
 def _select_followup_pcl_column(df: pd.DataFrame) -> str:
     for candidate in ["PCL_T3", "PCL_T2"]:
@@ -48,9 +53,19 @@ def _select_followup_pcl_column(df: pd.DataFrame) -> str:
 
 
 def _aggregate_text_features(df_task1: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    """
+    Aggregate text features to subject level.
+    Standard aggregation (Mean, Std, Slope) + Advanced Mining (Dissociation, Breakthrough).
+    """
     nlp_features = ["VAM_index", "SAM_index", "temporal", "coherence", "reflection", "sensory", "arousal"]
+    
+    # Ensure numeric types
+    for col in nlp_features:
+        if col in df_task1.columns:
+            df_task1[col] = pd.to_numeric(df_task1[col], errors="coerce")
+    
+    # 1. Basic aggregation
     agg_funcs = {feat: ["mean", safe_std0, calculate_slope] for feat in nlp_features}
-
     df_agg = df_task1.groupby("name").agg(agg_funcs)
     df_agg.columns = ["_".join(col).strip() for col in df_agg.columns.values]
     df_agg.reset_index(inplace=True)
@@ -58,6 +73,23 @@ def _aggregate_text_features(df_task1: pd.DataFrame) -> tuple[pd.DataFrame, list
 
     text_feature_cols = [c for c in df_agg.columns if c != "Name"]
     df_agg[text_feature_cols] = df_agg[text_feature_cols].replace([np.inf, -np.inf], np.nan).fillna(0.0)
+    
+    # 2. Advanced feature mining (Dissociation & Breakthrough)
+    print("  Running advanced feature mining (Dissociation & Breakthrough)...")
+    df_task1_with_name = df_task1.copy()
+    if "name" in df_task1_with_name.columns:
+        df_task1_with_name.rename(columns={"name": "Name"}, inplace=True)
+    
+    df_advanced = mine_advanced_features(df_task1_with_name)
+    
+    # Merge advanced features if available
+    if not df_advanced.empty:
+        df_agg = pd.merge(df_agg, df_advanced, on="Name", how="left")
+        # Update feature list to include advanced features
+        text_feature_cols = [c for c in df_agg.columns if c != "Name"]
+        # Fill NA with 0
+        df_agg[text_feature_cols] = df_agg[text_feature_cols].fillna(0.0)
+    
     return df_agg, text_feature_cols
 
 
@@ -117,6 +149,34 @@ def main(
 
     df_final = df_merged.dropna(subset=["PCL_delta", "Is_NonResponder"]).copy()
     print(f"Final sample size (subject-level): {len(df_final)} | Unique Name: {df_final['Name'].nunique()}")
+
+    # --- Unsupervised Analysis: Spectral Clustering ---
+    # Use advanced features + key dynamic features for clustering
+    print("\n[Unsupervised] Spectral Clustering Analysis...")
+    clustering_feats = []
+    
+    # Check for advanced features
+    potential_feats = [
+        'Advanced_dissociation_index_mean',
+        'Advanced_dissociation_index_max', 
+        'Advanced_reflection_max',
+        'VAM_index_calculate_slope',
+        'reflection_calculate_slope',
+        'coherence_mean'
+    ]
+    
+    # Only use features that exist in the dataframe
+    clustering_feats = [c for c in potential_feats if c in df_final.columns]
+    
+    if len(clustering_feats) >= 2:
+        df_final = run_spectral_clustering(
+            df_final, 
+            clustering_feats, 
+            results_dir,
+            n_clusters=3
+        )
+    else:
+        print(f"  [Warning] Not enough features for clustering (found {len(clustering_feats)}), skipping unsupervised analysis.")
 
     baseline_scale_cols = pick_baseline_scale_columns(df_final)
     feature_cols = list(dict.fromkeys(text_feature_cols + baseline_scale_cols))

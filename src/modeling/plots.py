@@ -1,3 +1,7 @@
+# src/modeling/plots.py
+"""
+Plotting utilities for model diagnostics and feature importance visualization.
+"""
 from __future__ import annotations
 
 from pathlib import Path

@@ -6,23 +6,23 @@
     "0": 29,
     "1": 12
   },
-  "n_text_features": 21,
+  "n_text_features": 24,
   "n_baseline_scale_features": 8,
-  "n_model_features_after_dummies": 29,
+  "n_model_features_after_dummies": 32,
   "binary_models": {
     "logreg": {
       "oof": {
-        "roc_auc": 0.5862068965517241,
-        "auprc": 0.45608026537302854,
-        "brier": 0.2480272207969437,
-        "balanced_accuracy": 0.6436781609195402,
-        "f1": 0.5161290322580645,
-        "threshold": 0.4796290747344503,
+        "roc_auc": 0.5603448275862069,
+        "auprc": 0.4158386789723864,
+        "brier": 0.2544498773315149,
+        "balanced_accuracy": 0.6264367816091954,
+        "f1": 0.5,
+        "threshold": 0.47468710486357907,
         "sensitivity": 0.6666666666666666,
-        "specificity": 0.6206896551724138,
+        "specificity": 0.5862068965517241,
         "confusion_matrix": {
-          "tn": 18,
-          "fp": 11,
+          "tn": 17,
+          "fp": 12,
           "fn": 4,
           "tp": 8
         }
@@ -30,23 +30,23 @@
     },
     "xgb": {
       "oof": {
-        "roc_auc": 0.5373563218390804,
-        "auprc": 0.42710567134612737,
-        "brier": 0.28222846943287894,
-        "balanced_accuracy": 0.6293103448275862,
-        "f1": 0.48,
-        "threshold": 0.52413409948349,
-        "sensitivity": 0.5,
-        "specificity": 0.7586206896551724,
+        "roc_auc": 0.5114942528735632,
+        "auprc": 0.3696435301698459,
+        "brier": 0.31673899858379845,
+        "balanced_accuracy": 0.5818965517241379,
+        "f1": 0.47368421052631576,
+        "threshold": 0.21253375709056854,
+        "sensitivity": 0.75,
+        "specificity": 0.41379310344827586,
         "confusion_matrix": {
-          "tn": 22,
-          "fp": 7,
-          "fn": 6,
-          "tp": 6
+          "tn": 12,
+          "fp": 17,
+          "fn": 3,
+          "tp": 9
         }
       }
     }
   },
   "binary_best_by_auprc": "logreg",
-  "regression_oof_r2": 0.01943972395923499
+  "regression_oof_r2": -0.01030883013319972
 }

@@ -1,6 +1,6 @@
 # src/modeling/unsupervised.py
 """
-执行Spectral Clustering并可视化结果，以发现数据中的潜在群体结构。
+implementation of unsupervised learning methods for cognitive reasoning data analysis.
 """
 import matplotlib.pyplot as plt
 import pandas as pd

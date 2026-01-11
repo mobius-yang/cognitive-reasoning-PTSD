@@ -7,7 +7,7 @@ requires-python = ">=3.8"
 authors = [ { name="Student", email="" } ]
 
 [project.urls]
-"Homepage" = "https://github.com/mobius-yang/cognitive-reasoning#"
+"Homepage" = "https://github.com/mobius-yang/cognitive-reasoning-PTSD"
 
 [project.dependencies]
 numpy = "*"

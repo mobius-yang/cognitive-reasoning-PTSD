@@ -1,8 +1,6 @@
 # src/modeling/feature_mining.py
 """
-我们尝试挖掘高级机制特征：
-1. 主观-客观错位 (Dissociation): NLP Arousal vs SUDS
-2. 意义加工峰值 (Breakthrough): Max Reflection
+high-level feature mining functions for PTSD mechanism exploration.
 """
 import numpy as np
 import pandas as pd
@@ -14,7 +12,7 @@ def mine_advanced_features(df_session: pd.DataFrame) -> pd.DataFrame:
     required_cols = ['Name', 'arousal', 'suds_after', 'reflection']
     for col in required_cols:
         if col not in df.columns:
-            print(f"[Warning] 缺少列 {col}，跳过高级特征挖掘。")
+            print(f"[Feature Mining] Missing required column: {col}. Cannot compute advanced features.")
             return pd.DataFrame()
 
 
@@ -26,10 +24,10 @@ def mine_advanced_features(df_session: pd.DataFrame) -> pd.DataFrame:
     df['norm_arousal'] = scaler.fit_transform(df[['arousal_filled']])
     df['norm_suds'] = scaler.fit_transform(df[['suds_filled']])
 
-    # 计算主观-客观错位指数
+    # compute dissociation index
     df['dissociation_index'] = (df['norm_arousal'] - df['norm_suds']).abs()
 
-    # 聚合到被试级
+    # cluster by Name and aggregate
     agg_funcs = {
         'dissociation_index': ['mean', 'max'],
         'reflection': ['max']  

@@ -1,0 +1,1 @@
+python src/model.py --task1 data/task1_scored.xlsx --task2 data/task2_processing_data.xlsx --results-dir results --seed 42

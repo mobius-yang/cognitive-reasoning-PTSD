@@ -25,12 +25,37 @@ venv/
 __pycache__/
 *.pyc
 
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+.eggs/
+.python-version
+env/
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+
+
+# Byte-compiled / optimized
+__pycache__/
+*.pyc
+
 # Environments
 .env
 *.env
 
-/data
-
-
-# 忽略要求及说明.md
+# Prevent sensitive data and backups from being pushed
+data/
+.backup/
 要求及说明.md

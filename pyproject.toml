@@ -1,7 +1,7 @@
 [project]
-name = "cognitive-reasoning-project"
+name = "cognitive-reasoning-PTSD"
 version = "0.1.0"
-description = "Course project for 认知推理 — data processing and modeling"
+description = "A cognitive reasoning analysis package for PTSD mechanism exploration."
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [ { name="Student", email="" } ]

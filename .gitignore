@@ -19,10 +19,7 @@ venv/
 # macOS
 .DS_Store
 
-# Results and temporary
-results/
-logs/
-*.log
+
 
 # Byte-compiled / optimized
 __pycache__/
@@ -31,3 +28,9 @@ __pycache__/
 # Environments
 .env
 *.env
+
+/data
+
+
+# 忽略要求及说明.md
+要求及说明.md

@@ -29,4 +29,15 @@ pip install -r requirements.txt
 python src/model.py
 ```
 
+上传到 GitHub 建议
 
+```bash
+git init
+git add .
+git commit -m "Initial project structure"
+# 在 GitHub 上建立仓库后：
+# git remote add origin git@github.com:mobius-yang/cognitive-reasoning.git
+# git push -u origin main
+```
+
+如需我帮助生成详细的 `README`、`LICENSE`、或 GitHub Actions CI 配置，请告诉我。

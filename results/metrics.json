@@ -1,0 +1,52 @@
+{
+  "n_samples_subject_level": 41,
+  "followup_col": "PCL_T3",
+  "threshold_delta": -10.0,
+  "class_distribution(Is_NonResponder)": {
+    "0": 29,
+    "1": 12
+  },
+  "n_text_features": 21,
+  "n_baseline_scale_features": 8,
+  "n_model_features_after_dummies": 29,
+  "binary_models": {
+    "logreg": {
+      "oof": {
+        "roc_auc": 0.5862068965517241,
+        "auprc": 0.45608026537302854,
+        "brier": 0.2480272207969437,
+        "balanced_accuracy": 0.6436781609195402,
+        "f1": 0.5161290322580645,
+        "threshold": 0.4796290747344503,
+        "sensitivity": 0.6666666666666666,
+        "specificity": 0.6206896551724138,
+        "confusion_matrix": {
+          "tn": 18,
+          "fp": 11,
+          "fn": 4,
+          "tp": 8
+        }
+      }
+    },
+    "xgb": {
+      "oof": {
+        "roc_auc": 0.5373563218390804,
+        "auprc": 0.42710567134612737,
+        "brier": 0.28222846943287894,
+        "balanced_accuracy": 0.6293103448275862,
+        "f1": 0.48,
+        "threshold": 0.52413409948349,
+        "sensitivity": 0.5,
+        "specificity": 0.7586206896551724,
+        "confusion_matrix": {
+          "tn": 22,
+          "fp": 7,
+          "fn": 6,
+          "tp": 6
+        }
+      }
+    }
+  },
+  "binary_best_by_auprc": "logreg",
+  "regression_oof_r2": 0.01943972395923499
+}

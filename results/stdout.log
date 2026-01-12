@@ -1,0 +1,52 @@
+Loading input data...
+Aggregating text features (subject-level)...
+  Running advanced feature mining (Dissociation & Breakthrough)...
+[Feature Mining] Constructed 3 advanced mechanism features (Dissociation & Breakthrough).
+  Extracting SUDS time-series features (ARIMA + GARCH)...
+Aggregating task2 to subject-level (avoid CV leakage)...
+Merging datasets (subject-level)...
+Final sample size (subject-level): 41 | Unique Name: 41
+
+[Unsupervised] Spectral Clustering Analysis...
+[Unsupervised] Running Spectral Clustering Analysis
+Clustering analysis completed. Please check the clustering images in results.
+[A] Binary classification: predict non-response (Is_NonResponder=1)
+
+[A/logreg] Training + cross-validation...
+[A/logreg] OOF: AUC=0.566 AUPRC=0.413 Brier=0.261 thr=0.589
+              precision    recall  f1-score   support
+
+           0      0.800     0.828     0.814        29
+           1      0.545     0.500     0.522        12
+
+    accuracy                          0.732        41
+   macro avg      0.673     0.664     0.668        41
+weighted avg      0.725     0.732     0.728        41
+
+
+[A/xgb] Training + cross-validation...
+[A/xgb] OOF: AUC=0.546 AUPRC=0.346 Brier=0.294 thr=0.256
+              precision    recall  f1-score   support
+
+           0      0.824     0.483     0.609        29
+           1      0.375     0.750     0.500        12
+
+    accuracy                          0.561        41
+   macro avg      0.599     0.616     0.554        41
+weighted avg      0.692     0.561     0.577        41
+
+[C] 3-class classification: fast/slow/non-responder
+              precision    recall  f1-score   support
+
+           0      0.182     0.182     0.182        11
+           1      0.000     0.000     0.000        10
+           2      0.440     0.550     0.489        20
+
+    accuracy                          0.317        41
+   macro avg      0.207     0.244     0.224        41
+weighted avg      0.263     0.317     0.287        41
+
+[B] Regression: predict PCL_delta
+[B] OOF R2=-0.029
+
+Done. Results saved to results/ (including metrics.json).

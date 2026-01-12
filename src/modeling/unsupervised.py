@@ -64,6 +64,15 @@ def run_spectral_clustering(
     plt.tight_layout()
     plt.savefig(results_dir / "spectral_clustering_heatmap.png")
     plt.close()
+    # save numeric cluster outputs for downstream analysis
+    try:
+        df_features[["Name", "Cluster_Label"]].to_csv(results_dir / "spectral_clusters.csv", index=False)
+    except Exception:
+        pass
+    try:
+        cluster_means.to_csv(results_dir / "spectral_cluster_means.csv")
+    except Exception:
+        pass
     
     print(f"Clustering analysis completed. Please check the clustering images in {results_dir}.")
     return df_features

@@ -11,7 +11,7 @@
 ## 环境要求
 
 - Python 版本：建议 3.9+（3.8+ 也通常可用）
-- 依赖：见 `requirements.txt`，核心依赖包括 `pandas`、`scikit-learn`、`matplotlib`、`seaborn`、`xgboost`
+- 依赖：见 `requirements.txt`，核心依赖包括 `pandas`、`scikit-learn`、`matplotlib`、`seaborn`、`xgboost`、`statsmodels`
 
 
 ## 数据准备（请自行完成）
@@ -56,9 +56,13 @@ bash scripts/run_model.sh
     - `Advanced_dissociation_index_mean`：主观-客观错位指数均值（NLP arousal vs SUDS 差异的绝对值）
     - `Advanced_dissociation_index_max`：主观-客观错位指数峰值
     - `Advanced_reflection_max`：意义加工突破峰值（reflection 在各 session 的最大值）
+  - SUDS 时间序列动力学特征（自动提取）：
+    - 基础：`SUDS_after_mean` / `SUDS_after_std` / `SUDS_after_slope` / `SUDS_n_obs`
+    - ARIMA：`SUDS_ARIMA_(p,d,q)` + `SUDS_ARIMA_ar1`（惯性/inertia）等
+    - GARCH(1,1)：`SUDS_GARCH_(omega,alpha1,beta1)` + 条件方差汇总（如 `SUDS_GARCH_sigma2_mean/max/last`）
   - 基线量表特征：所有以 `_T1` 结尾的列（自动识别，如 `PCL_T1`、`GAD_T1`、`PHQ_T1` 等）
   - 类别型特征（如有）会自动做 one-hot 编码（drop_first=True）
-  - 总计：24 个文本特征（21 基础 + 3 高级）+ 8 个基线量表 = 32 维（编码后）
+  - 总计：文本特征（基础+高级）+ SUDS 动力学特征 + 基线量表特征（编码后以 `results/metrics.json` 为准）
 
 - 模型（使用 Stratified K-Fold CV + GridSearchCV 调参）：
   1. Logistic Regression（`logreg`）
@@ -289,4 +293,3 @@ JSON 格式的所有建模结果，包括：
   - 确保 task1 和 task2 的 `Name/name` 列能够正确匹配（大小写、空格、编码等）
   - 确认 `PCL_T1`、`PCL_T2/T3` 列存在且为数值型
 - 交叉验证折数：若样本量极小（< 10），CV 可能失败，可在 `pipeline.py` 中降低 `max_splits` 或改用 LeaveOneOut
-

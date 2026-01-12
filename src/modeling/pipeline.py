@@ -28,6 +28,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
 
+
 from .core_utils import (
     build_X,
     calculate_slope,
@@ -43,7 +44,10 @@ from .core_utils import (
 )
 from .plots import plot_binary_diagnostics, plot_top_feature_importance, plot_triclass_confusion
 from .feature_mining import mine_advanced_features
+from .time_series import extract_suds_dynamics_features
 from .unsupervised import run_spectral_clustering
+
+_N_JOBS = 1
 
 def _select_followup_pcl_column(df: pd.DataFrame) -> str:
     for candidate in ["PCL_T3", "PCL_T2"]:
@@ -88,6 +92,14 @@ def _aggregate_text_features(df_task1: pd.DataFrame) -> tuple[pd.DataFrame, list
         # Update feature list to include advanced features
         text_feature_cols = [c for c in df_agg.columns if c != "Name"]
         # Fill NA with 0
+        df_agg[text_feature_cols] = df_agg[text_feature_cols].fillna(0.0)
+
+    # 3. SUDS time-series analysis features (ARIMA dynamics + GARCH volatility)
+    print("  Extracting SUDS time-series features (ARIMA + GARCH)...")
+    df_suds_ts = extract_suds_dynamics_features(df_task1_with_name)
+    if not df_suds_ts.empty:
+        df_agg = pd.merge(df_agg, df_suds_ts, on="Name", how="left")
+        text_feature_cols = [c for c in df_agg.columns if c != "Name"]
         df_agg[text_feature_cols] = df_agg[text_feature_cols].fillna(0.0)
     
     return df_agg, text_feature_cols
@@ -162,7 +174,10 @@ def main(
         'Advanced_reflection_max',
         'VAM_index_calculate_slope',
         'reflection_calculate_slope',
-        'coherence_mean'
+        'coherence_mean',
+        'SUDS_ARIMA_ar1',
+        'SUDS_GARCH_sigma2_mean',
+        'SUDS_GARCH_sigma2_max',
     ]
     
     # Only use features that exist in the dataframe
@@ -209,12 +224,15 @@ def main(
                 ]
             ),
             {"clf__C": [0.1, 1.0, 10.0]},
-        ),
-        "xgb": (
+        )
+    }
+
+    if XGBClassifier is not None:
+        binary_models["xgb"] = (
             XGBClassifier(
                 eval_metric="logloss",
                 random_state=random_state,
-                n_jobs=-1,
+                n_jobs=_N_JOBS,
                 scale_pos_weight=scale_pos_weight,
             ),
             {
@@ -224,8 +242,9 @@ def main(
                 "subsample": [0.8, 1.0],
                 "colsample_bytree": [0.8, 1.0],
             },
-        ),
-    }
+        )
+    else:
+        print("  [Warning] `xgboost` not installed; skipping XGBClassifier baseline.")
 
     binary_results: dict[str, dict] = {}
     best_model_name = None
@@ -238,7 +257,7 @@ def main(
             param_grid=param_grid,
             scoring="average_precision",
             cv=cv_bin if cv_bin is not None else 3,
-            n_jobs=-1,
+            n_jobs=_N_JOBS,
             refit=True,
         )
 
@@ -301,7 +320,7 @@ def main(
             param_grid=best_param_grid,
             scoring="average_precision",
             cv=cv_bin if cv_bin is not None else 3,
-            n_jobs=-1,
+            n_jobs=_N_JOBS,
             refit=True,
         )
         best_search.fit(X_bin, y_bin)
@@ -343,7 +362,7 @@ def main(
             param_grid={"svm__C": [0.1, 1, 10], "svm__gamma": ["scale", 0.01, 0.1]},
             scoring="f1_macro",
             cv=cv_tri if cv_tri is not None else 3,
-            n_jobs=-1,
+            n_jobs=_N_JOBS,
             refit=True,
         )
         if cv_tri is not None:

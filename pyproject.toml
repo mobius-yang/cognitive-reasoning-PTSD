@@ -16,6 +16,7 @@ scikit-learn = "*"
 matplotlib = "*"
 seaborn = "*"
 xgboost = "*"
+statsmodels = "*"
 
 [build-system]
 requires = ["setuptools>=61.0","wheel"]

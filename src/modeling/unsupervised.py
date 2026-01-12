@@ -28,7 +28,7 @@ def run_spectral_clustering(
         n_clusters=n_clusters, 
         affinity='nearest_neighbors', # good for manifold data
         random_state=42,
-        n_jobs=-1
+        n_jobs=1
     )
     labels = spectral.fit_predict(X_scaled)
    

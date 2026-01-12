@@ -6,41 +6,41 @@
     "0": 29,
     "1": 12
   },
-  "n_text_features": 24,
+  "n_text_features": 45,
   "n_baseline_scale_features": 8,
-  "n_model_features_after_dummies": 32,
+  "n_model_features_after_dummies": 53,
   "binary_models": {
     "logreg": {
       "oof": {
-        "roc_auc": 0.5603448275862069,
-        "auprc": 0.4158386789723864,
-        "brier": 0.2544498773315149,
-        "balanced_accuracy": 0.6264367816091954,
+        "roc_auc": 0.5632183908045977,
+        "auprc": 0.4088542770429235,
+        "brier": 0.2615357482826588,
+        "balanced_accuracy": 0.646551724137931,
         "f1": 0.5,
-        "threshold": 0.47468710486357907,
-        "sensitivity": 0.6666666666666666,
-        "specificity": 0.5862068965517241,
+        "threshold": 0.5850144782036628,
+        "sensitivity": 0.5,
+        "specificity": 0.7931034482758621,
         "confusion_matrix": {
-          "tn": 17,
-          "fp": 12,
-          "fn": 4,
-          "tp": 8
+          "tn": 23,
+          "fp": 6,
+          "fn": 6,
+          "tp": 6
         }
       }
     },
     "xgb": {
       "oof": {
-        "roc_auc": 0.5114942528735632,
-        "auprc": 0.3696435301698459,
-        "brier": 0.31673899858379845,
-        "balanced_accuracy": 0.5818965517241379,
-        "f1": 0.47368421052631576,
-        "threshold": 0.21253375709056854,
+        "roc_auc": 0.5574712643678161,
+        "auprc": 0.3537210899532339,
+        "brier": 0.2817760958588017,
+        "balanced_accuracy": 0.6336206896551724,
+        "f1": 0.5142857142857142,
+        "threshold": 0.22046086192131042,
         "sensitivity": 0.75,
-        "specificity": 0.41379310344827586,
+        "specificity": 0.5172413793103449,
         "confusion_matrix": {
-          "tn": 12,
-          "fp": 17,
+          "tn": 15,
+          "fp": 14,
           "fn": 3,
           "tp": 9
         }
@@ -48,5 +48,5 @@
     }
   },
   "binary_best_by_auprc": "logreg",
-  "regression_oof_r2": -0.01030883013319972
+  "regression_oof_r2": -0.027003347391443056
 }

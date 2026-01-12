@@ -12,6 +12,7 @@ import seaborn as sns
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
 from sklearn.metrics import average_precision_score, precision_recall_curve
+import json
 
 
 def plot_binary_diagnostics(
@@ -22,6 +23,7 @@ def plot_binary_diagnostics(
     title_suffix: str,
     out_prefix: str,
 ) -> None:
+    # Confusion matrix plot
     plt.figure(figsize=(6, 5))
     cm = confusion_matrix(y_true, y_pred)
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False)
@@ -31,6 +33,7 @@ def plot_binary_diagnostics(
     plt.savefig(results_dir / f"{out_prefix}_confusion_matrix.png")
     plt.close()
 
+    # ROC
     fpr, tpr, _ = roc_curve(y_true, y_prob)
     auc = float(roc_auc_score(y_true, y_prob))
     plt.figure(figsize=(6, 5))
@@ -41,6 +44,7 @@ def plot_binary_diagnostics(
     plt.savefig(results_dir / f"{out_prefix}_roc_curve.png")
     plt.close()
 
+    # Precision-Recall
     prec, rec, _ = precision_recall_curve(y_true, y_prob)
     ap = float(average_precision_score(y_true, y_prob))
     plt.figure(figsize=(6, 5))
@@ -52,6 +56,7 @@ def plot_binary_diagnostics(
     plt.savefig(results_dir / f"{out_prefix}_pr_curve.png")
     plt.close()
 
+    # Calibration
     frac_pos, mean_pred = calibration_curve(y_true, y_prob, n_bins=8, strategy="uniform")
     plt.figure(figsize=(6, 5))
     plt.plot(mean_pred, frac_pos, marker="o")
@@ -61,6 +66,22 @@ def plot_binary_diagnostics(
     plt.ylabel("Fraction of positives")
     plt.savefig(results_dir / f"{out_prefix}_calibration.png")
     plt.close()
+
+    # prepare numeric diagnostics to save as JSON for downstream reporting/LLM parsing
+    diagnostics = {
+        "confusion_matrix": cm.tolist(),
+        "roc": {"fpr": fpr.tolist(), "tpr": tpr.tolist(), "auc": float(auc)},
+        "pr": {"precision": prec.tolist(), "recall": rec.tolist(), "ap": float(ap)},
+        "calibration": {"frac_pos": frac_pos.tolist(), "mean_pred": mean_pred.tolist()},
+    }
+
+    # write diagnostics json
+
+    with open(results_dir / f"{out_prefix}_diagnostics.json", "w", encoding="utf-8") as fh:
+        json.dump(diagnostics, fh, ensure_ascii=False, indent=2)
+
+
+    return diagnostics
 
 
 def plot_triclass_confusion(
@@ -85,6 +106,12 @@ def plot_triclass_confusion(
     plt.title("Confusion Matrix (3-class)")
     plt.savefig(results_dir / out_name)
     plt.close()
+    # save numeric confusion matrix
+
+    cm = confusion_matrix(y_true, y_pred, labels=labels)
+    with open(results_dir / (out_name.replace('.png', '') + "_matrix.json"), "w", encoding="utf-8") as fh:
+        json.dump({"labels": labels, "class_names": class_names, "confusion_matrix": cm.tolist()}, fh, ensure_ascii=False, indent=2)
+
 
 
 def plot_top_feature_importance(
@@ -104,4 +131,15 @@ def plot_top_feature_importance(
     plt.tight_layout()
     plt.savefig(results_dir / out_name)
     plt.close()
+    # save numeric importances
+
+    importance_payload = {
+        "feature_names": list(feature_names),
+        "importances": [float(x) for x in importances.tolist()],
+    }
+    with open(results_dir / (out_name.replace('.png', '') + "_importances.json"), "w", encoding="utf-8") as fh:
+        json.dump(importance_payload, fh, ensure_ascii=False, indent=2)
+
+
+    return importance_payload
 

@@ -61,7 +61,18 @@ def _aggregate_text_features(df_task1: pd.DataFrame) -> tuple[pd.DataFrame, list
     Aggregate text features to subject level.
     Standard aggregation (Mean, Std, Slope) + Advanced Mining (Dissociation, Breakthrough).
     """
-    nlp_features = ["VAM_index", "SAM_index", "temporal", "coherence", "reflection", "sensory", "arousal"]
+    # include all VAM/SAM sub-dimensions so they appear as independent features
+    nlp_features = [
+        "VAM_index",
+        "SAM_index",
+        "temporal",
+        "coherence",
+        "reflection",
+        "language",
+        "perspective",
+        "sensory",
+        "arousal",
+    ]
     
     # Ensure numeric types
     for col in nlp_features:
@@ -227,24 +238,22 @@ def main(
         )
     }
 
-    if XGBClassifier is not None:
-        binary_models["xgb"] = (
-            XGBClassifier(
-                eval_metric="logloss",
-                random_state=random_state,
-                n_jobs=_N_JOBS,
-                scale_pos_weight=scale_pos_weight,
-            ),
-            {
-                "n_estimators": [100, 300],
-                "max_depth": [3, 5],
-                "learning_rate": [0.05, 0.1],
-                "subsample": [0.8, 1.0],
-                "colsample_bytree": [0.8, 1.0],
-            },
-        )
-    else:
-        print("  [Warning] `xgboost` not installed; skipping XGBClassifier baseline.")
+    binary_models["xgb"] = (
+        XGBClassifier(
+            eval_metric="logloss",
+            random_state=random_state,
+            n_jobs=_N_JOBS,
+            scale_pos_weight=scale_pos_weight,
+        ),
+        {
+            "n_estimators": [100, 300],
+            "max_depth": [3, 5],
+            "learning_rate": [0.05, 0.1],
+            "subsample": [0.8, 1.0],
+            "colsample_bytree": [0.8, 1.0],
+        },
+    )
+    
 
     binary_results: dict[str, dict] = {}
     best_model_name = None
@@ -283,7 +292,7 @@ def main(
         print(f"[A/{name}] OOF: AUC={roc_auc:.3f} AUPRC={auprc:.3f} Brier={brier:.3f} thr={thr:.3f}")
         print(classification_report(y_bin, y_pred_oof, digits=3))
 
-        plot_binary_diagnostics(
+        diagnostics = plot_binary_diagnostics(
             results_dir=results_dir,
             y_true=y_bin.to_numpy(),
             y_prob=y_prob_oof,
@@ -303,6 +312,7 @@ def main(
                 "sensitivity": sensitivity,
                 "specificity": specificity,
                 "confusion_matrix": {"tn": tn, "fp": fp, "fn": fn, "tp": tp},
+                "diagnostics": diagnostics,
             }
         }
 
@@ -334,7 +344,7 @@ def main(
             importances = clf.feature_importances_
             title = "Top 20 Feature Importance (XGBoost)"
 
-        plot_top_feature_importance(
+        importance_payload = plot_top_feature_importance(
             results_dir=results_dir,
             importances=importances,
             feature_names=feature_names,
@@ -342,6 +352,11 @@ def main(
             out_name="feature_importance.png",
             top_k=20,
         )
+        # attach numeric feature importance to metrics
+        try:
+            binary_results[name]["oof"]["feature_importance"] = importance_payload
+        except Exception:
+            pass
 
     if tri_available:
         print("[C] 3-class classification: fast/slow/non-responder")
@@ -390,7 +405,7 @@ def main(
         print(f"[B] OOF R2={metrics_payload['regression_oof_r2']:.3f}")
 
     rf_model.fit(X_bin, y_reg)
-    plot_top_feature_importance(
+    importance_payload_reg = plot_top_feature_importance(
         results_dir=results_dir,
         importances=rf_model.feature_importances_,
         feature_names=feature_names,
@@ -398,6 +413,15 @@ def main(
         out_name="feature_importance_regression.png",
         top_k=20,
     )
+
+    metrics_payload["regression_feature_importances"] = importance_payload_reg
+
+
+    # save full metrics payload as JSON for numeric reporting
+    try:
+        save_json(results_dir / "metrics.json", metrics_payload)
+    except Exception:
+        print("Warning: failed to write metrics.json")
 
     save_json(results_dir / "metrics.json", metrics_payload)
     print("\nDone. Results saved to results/ (including metrics.json).")

@@ -1,0 +1,29 @@
+{
+  "labels": [
+    0,
+    1,
+    2
+  ],
+  "class_names": [
+    "Non-responder",
+    "Slow responder",
+    "Fast responder"
+  ],
+  "confusion_matrix": [
+    [
+      2,
+      2,
+      7
+    ],
+    [
+      3,
+      0,
+      7
+    ],
+    [
+      6,
+      3,
+      11
+    ]
+  ]
+}

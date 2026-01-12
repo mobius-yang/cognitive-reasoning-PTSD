@@ -1,0 +1,3 @@
+Wrote: results/ablation_vam_sam_20260112_162039/logreg.json
+Wrote: results/ablation_vam_sam_20260112_162039/logreg.csv
+Rows: 32 | Seeds: 1 | Mode: full | weight_dims: ['temporal', 'coherence', 'reflection', 'language', 'perspective', 'sensory', 'arousal'] | weight_grid: [1.0, 1.5, 2.0, 3.0]
